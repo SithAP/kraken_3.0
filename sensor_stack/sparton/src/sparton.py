@@ -237,6 +237,15 @@ def getData():
 
     allData = imuData()
 
+    # print roll, pitch, yaw
+	# Fix the roll, pitch by subtracting it from 360
+	roll  = 360 - roll
+	pitch = 360 - pitch
+
+	roll = roll % 360
+	pitch = pitch % 360
+	yaw = yaw % 360
+
     allData.data[0] = roll
     allData.data[1] = pitch
     allData.data[2] = yaw
@@ -335,7 +344,15 @@ def new_msg_format():
 
     msg1 = Imu()
     msg2 = magnetoTemp()
+    # print roll, pitch, yaw
+    # Fix the roll, pitch by subtracting it from 360
 
+    roll  = 360 - roll
+    pitch = 360 - pitch
+
+    roll = roll % 360
+    pitch = pitch % 360
+    yaw = yaw % 360
 
     quaternion_ned = tf.transformations.quaternion_from_euler(roll*np.pi/180.0, pitch*np.pi/180.0, yaw*np.pi/180.0)
     enu_to_ned= tf.transformations.quaternion_from_euler(np.pi,0,np.pi/2)
