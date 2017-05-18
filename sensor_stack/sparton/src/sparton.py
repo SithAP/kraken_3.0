@@ -59,9 +59,10 @@ gy = 0.0
 gz = 0.0
 temp = 0.0
 magError = 0.0
+g=0.0
 ##
-    
- 
+
+
 def setBaud(rate):
     if (rate == 300):
         message = '$PSPA,BAUD=0\r\n'
@@ -81,7 +82,7 @@ def setBaud(rate):
         message = '$PSPA,BAUD=7\r\n'
     elif (rate == 115200) :
         message = '$PSPA,BAUD=8\r\n'
-    
+
     imu.write(message)
     garbage = ''
     total = ''
@@ -96,12 +97,12 @@ def temperature():
     garbage = ''
     total = ''
     data = []
-    global temp 
+    global temp
     while (garbage != '\r'):
         garbage = imu.read()
         total += garbage
     #print total
-    
+
     data = total.split(',')
     temp = float((data[1]).split('='))
 
@@ -111,67 +112,68 @@ def rpyt():
     garbage = ''
     total = ''
     data = []
-    
-    global roll 
-    global pitch 
-    global yaw 
-    global temp 
-    global magError 
-    
+
+    global roll
+    global pitch
+    global yaw
+    global temp
+    global magError
+
     while (garbage != '\r'):
         garbage = imu.read()
         total += garbage
     #print total
-    
+
     data = total.split(',')
-    
+
     yaw = float(data[5])
     pitch = float(data[8])
     roll = float(data[11])
     temp = float(data[14])
     magError = float(((data[17]).split('*'))[0])
-    
+
 def accelero():
     command = '$PSPA,A\r\n'
     imu.write(command)
     garbage = ''
     total = ''
     global ax
-    global ay 
-    global az 
-    
+    global ay
+    global az
+    global g
+
     data = []
-    
+
     while (garbage != '\r'):
         garbage = imu.read()
         total += garbage
     #print total
-    
+
     data = total.split(',')
     #print data
-    ax = float(((data[1]).split('='))[1])
-    ay = float(((data[2]).split('='))[1])
-    az = float(((((data[3]).split('='))[1]).split('*'))[0])
-    
+    ax = -float(((data[1]).split('='))[1])*g/1000.0
+    ay = -float(((data[2]).split('='))[1])*g/1000.0
+    az = -float(((((data[3]).split('='))[1]).split('*'))[0])*g/1000.0
+
 def gyro():
     command = '$PSPA,G\r\n'
     imu.write(command)
     garbage = ''
     total = ''
     data = []
-    global gx 
-    global gy 
+    global gx
+    global gy
     global gz
 
     while (garbage != '\r'):
         garbage = imu.read()
         total += garbage
     #print total
-    
+
     data = total.split(',')
-    gx = float(((data[1]).split('='))[1])
-    gy = float(((data[2]).split('='))[1])
-    gz = float(((((data[3]).split('='))[1]).split('*'))[0])
+    gx = float(((data[1]).split('='))[1])*np.pi/180000.0
+    gy = float(((data[2]).split('='))[1])*np.pi/180000.0
+    gz = float(((((data[3]).split('='))[1]).split('*'))[0])*np.pi/180000.0
 
 def magneto():
     command = '$PSPA,M\r\n'
@@ -179,15 +181,15 @@ def magneto():
     garbage = ''
     total = ''
     data = []
-    global mx 
-    global my 
+    global mx
+    global my
     global mz
 
     while (garbage != '\r'):
         garbage = imu.read()
         total += garbage
     #print total
-    
+
     data = total.split(',')
     mx = float(((data[1]).split('='))[1])
     my = float(((data[2]).split('='))[1])
@@ -206,12 +208,12 @@ def pitchRoll():
         garbage = imu.read()
         total += garbage
     #print total
-    
+
     data = total.split(',')
     ax = float(((data[1]).split('='))[1])
     ay = float(((data[2]).split('='))[1])
     az = float(((((data[3]).split('='))[1]).split('*'))[0])
- 
+
 def getData():
     global roll
     global pitch
@@ -227,14 +229,14 @@ def getData():
     global gz
     global temp
     global magError
-    
+
     accelero()
     gyro()
     magneto()
     rpyt()
-    
+
     allData = imuData()
-    
+
     allData.data[0] = roll
     allData.data[1] = pitch
     allData.data[2] = yaw
@@ -248,7 +250,7 @@ def getData():
     allData.data[10] = gy
     allData.data[11] = gz
     allData.data[12] = temp
-    
+
     return allData
 
 def getOrientationCovariance():
@@ -258,7 +260,7 @@ def getOrientationCovariance():
     # global yaw
 
     if rospy.has_param('OrientationCov_mat'):
-        cov_mat = rospy.get_param('OrientationCov_mat')
+        cov_mat = map(float,rospy.get_param('OrientationCov_mat')[1:-1].split(','))
     else:
         cov_mat = [0.0] * 9
     return cov_mat
@@ -269,7 +271,7 @@ def getAngularVelocityCovariance():
     # global gy
     # global gz
     if rospy.has_param('AngularVelCov_mat'):
-        cov_mat = rospy.get_param('AngularVelCov_mat')
+        cov_mat = map(float,rospy.get_param('AngularVelCov_mat')[1:-1].split(','))
     else:
         cov_mat = [0.0] * 9
     return cov_mat
@@ -280,7 +282,7 @@ def getLinearAccelerationCovariance():
     # global ay
     # global az
     if rospy.has_param('LinearAccelerationCov_mat'):
-        cov_mat = rospy.get_param('LinearAccelerationCov_mat')
+        cov_mat = map(float,rospy.get_param('LinearAccelerationCov_mat')[1:-1].split(','))
     else:
         cov_mat = [0.0] * 9
     return cov_mat
@@ -323,26 +325,44 @@ def new_msg_format():
     global gz
     global temp
     global magError
-    
+
     accelero()
     gyro()
     magneto()
     rpyt()
 
     #msg1 = imuData_new()
-    
+
     msg1 = Imu()
     msg2 = magnetoTemp()
 
 
-    quaternion = tf.transformations.quaternion_from_euler(roll, pitch, yaw)
-    msg1.orientation = Quaternion(quaternion[0],quaternion[1],quaternion[2],quaternion[3])
+    quaternion_ned = tf.transformations.quaternion_from_euler(roll*np.pi/180.0, pitch*np.pi/180.0, yaw*np.pi/180.0)
+    enu_to_ned= tf.transformations.quaternion_from_euler(np.pi,0,np.pi/2)
+    quaternion_enu=tf.transformations.quaternion_multiply(enu_to_ned,quaternion_ned)
+
+    #rpy_enu=tf.transformations.euler_from_quaternion(quaternion_enu)
+    #print "\nRoll_NED= "+str(roll)+"\tPitch_NED= "+str(pitch)+"\tYaw_NED= "+str(yaw)
+    #print "Roll_ENU= "+str(rpy_enu[0]*180.0/np.pi)+"\tPitch_ENU= "+str(rpy_enu[1]*180.0/np.pi)+"\tYaw_ENU= "+str(rpy_enu[2]*180.0/np.pi)
+    #print "Acceleration Magnitude= "+str(np.sqrt(ax**2+ay**2+az**2))
+
+    ## Offset Calculation (Done Offline)
+    # g_vector=np.array([0,0,g,1.0])
+    # RotMat_enu=tf.transformations.quaternion_matrix(quaternion_enu)
+    # g_body=np.dot(RotMat_enu.transpose(),g_vector)[0:3]
+    # a_vector=np.array([ax,ay,az])
+    # offset=a_vector-g_body
+    # offset_world=np.dot(RotMat_enu,np.append(offset,1.0))[0:3]
+    # print "Offset Vector= "+str(offset_world)+"\nOffset Magnitude= "+str(np.linalg.norm(offset_world))
+
+
+    msg1.orientation = Quaternion(quaternion_enu[0],quaternion_enu[1],quaternion_enu[2],quaternion_enu[3])
     msg1.orientation_covariance = getOrientationCovariance()
     msg1.angular_velocity = Vector3(gx,gy,gz)
-    msg1.angular_velocity_covariance = getAngularVelocityCovariance() 
+    msg1.angular_velocity_covariance = getAngularVelocityCovariance()
     msg1.linear_acceleration = Vector3(ax,ay,az)
     msg1.linear_acceleration_covariance = getLinearAccelerationCovariance()
-
+    msg1.header.frame_id='imu'
     msg2.magnetometer = Vector3(mx,my,mz)
     msg2.temperature = temp
 
@@ -350,8 +370,9 @@ def new_msg_format():
 
 if __name__ == '__main__':
 
+    #global g
     pubData = [0.0] * 13
-    
+    g=rospy.get_param('gravitational_acceleration',9.80665)
     if (not imu.isOpen) :
         imu.close()
         imu.open()
@@ -362,14 +383,15 @@ if __name__ == '__main__':
         print 'Error in opening port'
 
     r = rospy.Rate(10)
-    
+
     while not rospy.is_shutdown():
 
         pubData = getData()
         new_msg1 , new_msg2 = new_msg_format()
         pub1.publish(pubData)
+        new_msg1.header.stamp=rospy.Time.now()
         pub2.publish(new_msg1)
-        pub2.publish(new_msg2)
+        #pub2.publish(new_msg2)
         r.sleep()
 
     imu.close()
