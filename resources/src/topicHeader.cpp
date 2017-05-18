@@ -48,10 +48,10 @@ const char* CONTROL_LOADPARAM="/kraken/control/loadparam_srv";
 
 
 //sensor topics
-const char* SENSOR_IMU="/kraken/sensor/imu";
-const char* SENSOR_IMU_NEW="/kraken/sensor/imu_new";
-const char* SENSOR_DEPTH="/kraken/sensor/depth";
-const char* SENSOR_DVL="/kraken/sensor/dvl";
+const char* SENSOR_IMU="/kraken/sensors/imu";
+const char* SENSOR_IMU_NEW="/kraken/sensors/IMU";
+const char* SENSOR_DEPTH="/kraken/sensors/depth";
+const char* SENSOR_DVL="/kraken/sensors/DVL";
 
 
 //hardware-stack
