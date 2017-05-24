@@ -1,4 +1,6 @@
-import roslib;roslib.load_manifest('keyboard_control')
+#!/usr/bin/env python
+
+import roslib; roslib.load_manifest('keyboard_control')
 
 from Tkinter import *
 import rospy
@@ -36,6 +38,7 @@ def editGui(data):
     present6.data[4] = previous6.data[4] = data.data[4]
     present6.data[5] = previous6.data[5] = data.data[5]
 
+    #print "Hello!"
     # if FIRST_ITERATION:
 
     #     present6.data[0] = previous6.data[0] = data.data[0]
@@ -106,23 +109,23 @@ def create_callbacks(arg):
 
         if arg == 0:
 
-            present6.data[4] = previous6.data[4] - MIN_THRUST_INPUT
-            present6.data[5] = previous6.data[5] + MIN_THRUST_INPUT
+            present6.data[2] = previous6.data[2] - MIN_THRUST_INPUT
+            present6.data[3] = previous6.data[3] + MIN_THRUST_INPUT
 
         if arg == 1:
 
-            present6.data[4] = previous6.data[4] + MIN_THRUST_INPUT
-            present6.data[5] = previous6.data[5] - MIN_THRUST_INPUT
+            present6.data[2] = previous6.data[2] + MIN_THRUST_INPUT
+            present6.data[3] = previous6.data[3] - MIN_THRUST_INPUT
 
         if arg == 2:
 
-            present6.data[4] = previous6.data[4] - MIN_THRUST_INPUT
-            present6.data[5] = previous6.data[5] - MIN_THRUST_INPUT
+            present6.data[2] = previous6.data[2] - MIN_THRUST_INPUT
+            present6.data[3] = previous6.data[3] - MIN_THRUST_INPUT
 
         if arg == 3:
 
-            present6.data[4] = previous6.data[4] + MIN_THRUST_INPUT
-            present6.data[5] = previous6.data[5] + MIN_THRUST_INPUT
+            present6.data[2] = previous6.data[2] + MIN_THRUST_INPUT
+            present6.data[3] = previous6.data[3] + MIN_THRUST_INPUT
 
         if arg == 4:
 
@@ -189,6 +192,7 @@ root.bind("s", create_callbacks(2))
 root.bind("w", create_callbacks(3))
 root.bind("t", create_callbacks(4))
 root.bind("g", create_callbacks(5))
+root.bind("p",create_callbacks(6))
 root.bind("<space>", create_callbacks(6))
 
 frame.pack()
