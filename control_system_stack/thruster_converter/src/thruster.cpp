@@ -55,7 +55,7 @@ void thruster6callback(const kraken_msgs::thrusterData6ThrusterConstPtr msg)
         _output.data_array[j].speed        = offset[j];
         _output.data_array[j].info         = thruster_info[j];
     }
-          '''  _output.z_front.speed   =   00.0;      // Actually this part is unecessary as it will not help when callBack function is not called.
+          /*  _output.z_front.speed   =   00.0;      // Actually this part is unecessary as it will not help when callBack function is not called.
           _output.y_front.speed   =   00.0;
           _output.y_back.speed    =   00.0;
           _output.z_back.speed    =   00.0;
@@ -68,26 +68,26 @@ void thruster6callback(const kraken_msgs::thrusterData6ThrusterConstPtr msg)
           inData[3] = msg->y_back.speed;
           inData[4] = msg->x_right.speed;
           inData[5] = msg->x_left.speed;
-          '''
+          */
 
 
 
    for(int i = 0; i<6 ; i++ )
   {
-        inData[i] = msg->data_array[i].speed;
+        inData[i] = msg->data[i];
         ROS_DEBUG("indata[%d] : %f",i,inData[i]);
-        store[i] = uint8_t((converter*inData[i]>(max-offsetF)?(0xE6):converter*inData[i]+offsetF));
-        store[i] = uint8_t((converter*inData[i]<(min-offsetB)?(0x19):converter*inData[i]+offsetB));
+        store = uint8_t((converter*inData[i]>(max-offsetF)?(0xE6):converter*inData[i]+offsetF));
+        store = uint8_t((converter*inData[i]<(min-offsetB)?(0x19):converter*inData[i]+offsetB));
         ROS_DEBUG("store : %d",store);
 
-        if (store[i] > max)
+        if (store > max)
         {
-            store[i] = max;
+            store = max;
         }
 
-        if (store[i] < min)
+        if (store < min)
         {
-            store[i] = min;
+            store = min;
         }
 
         _output.data_array[i].speed = store;
@@ -99,13 +99,13 @@ void thruster6callback(const kraken_msgs::thrusterData6ThrusterConstPtr msg)
 call_back_flag    =     1;   //flag HIGH
 
 
-'''  _output.z_front.speed   =   store[0];
+/*  _output.z_front.speed   =   store[0];
   _output.y_front.speed   =   store[1];
   _output.y_back.speed    =   store[2];
   _output.z_back.speed    =   store[3];
   _output.x_right.speed   =   store[4];
   _output.x_left.speed    =   store[5];
-'''
+*/
 }
 
 int main(int argc,char** argv)
@@ -163,7 +163,7 @@ int main(int argc,char** argv)
 // HOW TO KNOW AND WHAT TO DO if CALL BACK FUNCTION NOT REACHED
         if(call_back_flag == 1)
         {
-          call_back_flag==0;
+          call_back_flag=0;
           printf("Call Back Function Reahced\n");
         }
         else

@@ -40,37 +40,34 @@ if __name__ == '__main__':
     thruster6Data  =    thrusterData6Thruster()
 
     signal.signal(signal.SIGINT, stopThrustersNow)
+    rospy.init_node('Control', anonymous=True)
+    pub6 = rospy.Publisher(topicHeader.CONTROL_PID_THRUSTER6, thrusterData6Thruster, queue_size = 2)
+    if rospy.has_param('/ros_rate'):
+        temp_rate = float(rospy.get_param('/ros_rate'))
+    else:
+        temp_rate = 8
+    r = rospy.Rate(temp_rate)
+    rospy.loginfo('Running with ROS_RATE of %0.2f Hz', temp_rate)
 
-	rospy.init_node('Control', anonymous=True)
-	pub6 = rospy.Publisher(topicHeader.CONTROL_PID_THRUSTER6, thruster6Data, queue_size = 2)
+    while not rospy.is_shutdown():
 
-        if rospy.has_param('/ros_rate'):
-            temp_rate = float(rospy.get_param('/ros_rate'))
-        else:
-            temp_rate = 8
-
-	r = rospy.Rate(temp_rate)
-        rospy.loginfo('Running with ROS_RATE of %0.2f Hz', temp_rate)
-
-	while not rospy.is_shutdown():
-
-        thruster6Data.data[thruster6Data.FRONT_Z]       = 00.0 # front
-		thruster6Data.data[thruster6Data.BACK_Z]        = 00.0 # back
-		thruster6Data.data[thruster6Data.LEFT_X]        = 00.0 # left
-		thruster6Data.data[thruster6Data.RIGHT_X]       = 00.0 # right
-		thruster6Data.data[thruster6Data.FRONT_Y]       = 00.0
-		thruster6Data.data[thruster6Data.BACK_Y]        = 00.0
+        thruster6Data.data[thruster6Data.FRONT_Z]       = 40.0 # front
+        thruster6Data.data[thruster6Data.BACK_Z]        = 40.0 # back
+        thruster6Data.data[thruster6Data.LEFT_X]        = 40.0 # left
+        thruster6Data.data[thruster6Data.RIGHT_X]       = 40.0 # right
+        thruster6Data.data[thruster6Data.FRONT_Y]       = 40.0
+        thruster6Data.data[thruster6Data.BACK_Y]        = 40.0
 
 
-		#print ctrl_c_pressed
+        #print ctrl_c_pressed
         if ctrl_c_pressed:
 
-		        thruster6Data.data[thruster6Data.FRONT_Z]     = 00.0 # front
-        		thruster6Data.data[thruster6Data.BACK_Z]      = 00.0 # back
-        		thruster6Data.data[thruster6Data.LEFT_X]      = 00.0 # left
-        		thruster6Data.data[thruster6Data.RIGHT_X]     = 00.0 # right
-        		thruster6Data.data[thruster6Data.FRONT_Y]     = 00.0
-        		thruster6Data.data[thruster6Data.BACK_Y]      = 00.0
+                thruster6Data.data[thruster6Data.FRONT_Z]     = 00.0 # front
+                thruster6Data.data[thruster6Data.BACK_Z]      = 00.0 # back
+                thruster6Data.data[thruster6Data.LEFT_X]      = 00.0 # left
+                thruster6Data.data[thruster6Data.RIGHT_X]     = 00.0 # right
+                thruster6Data.data[thruster6Data.FRONT_Y]     = 00.0
+                thruster6Data.data[thruster6Data.BACK_Y]      = 00.0
 
 
-		pub6.publish(output)
+        pub6.publish(thruster6Data)
